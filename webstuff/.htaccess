@@ -3,23 +3,26 @@ DirectoryIndex view
 
 SetHandler axkit
 
-AxGzipOutput Off
+AxGzipOutput On
+
+# If you have an error.xsl, uncomment this
+#AxErrorStylesheet text/xsl /stylesheets/error.xsl
+
+AxAddStyleMap text/xsl Apache::AxKit::Language::LibXSLT
 
 AxDebugLevel 7
+AxLogDeclines On
 
-<Perl>
-use lib '.';
-</Perl>
-
-AxAddXSPTaglib AxKit::XSP::Session
-AxAddXSPTaglib AxKit::XSP::PerForm
-AxAddXSPTaglib AxKit::XSP::Util
 AxAddXSPTaglib AxKit::XSP::Wiki
 
 AxAddRootProcessor application/x-xsp NULL xspwiki
 AxAddRootProcessor text/xsl wiki.xsl xspwiki
 
 AxTraceIntermediate /tmp/axkit-trace
+
+# you must create this directory, and it must be
+# writable by the apache user
+PerlSetVar WikiDBRoot /tmp/wikidbs
 
 <Files *.css>
 SetHandler default-handler

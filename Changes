@@ -1,5 +1,11 @@
 AxKit::XSP::Wiki Changes
 
+0.06
+    - Code cleanups
+    - Many XSLT fixes - should mostly work out of the box
+    - Added in missing files
+    - Fixed up the .htaccess file a bit
+
 0.05
     - Added history (including restore)
     - Added preview

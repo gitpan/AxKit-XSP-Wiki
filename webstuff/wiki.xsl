@@ -17,32 +17,31 @@
     <html>
       <head>
         <title><xsl:value-of select="/xspwiki/page"/></title>
-	<link rel="Stylesheet" href="/wiki/wiki.css"
+	<link rel="Stylesheet" href="/stylesheets/wiki.css"
               type="text/css" media="screen" />
       </head>
 	
       <body>
        <div class="topbanner">
-         <a href="http://xml.apache.org/"><img src="/img/xmlapache.gif" border="0"/></a>
-         AxKit Wiki
+         Development Wiki
        </div>
        <div class="base">
         <table><tr><td valign="top" width="160">
         <div class="sidemenu">
-         <xsl:apply-templates select="document('/wiki/sidemenu.xml')" mode="sidemenu"/>
+         <xsl:apply-templates select="document('/sidemenu.xml')" mode="sidemenu"/>
         </div></td><td valign="top" width="80%">
         <div class="maincontent">
          <div class="breadcrumbs">
-          <a href="/">AxKit</a> :: <a href="DefaultPage">Wiki</a> :: <xsl:value-of select="/xspwiki/page"/>
+             <a href="DefaultPage"><xsl:value-of select="/xspwiki/db"/></a> :: <xsl:value-of select="/xspwiki/page"/>
          </div>
-         <div class="line"/>
+         <hr/>
          <div class="content">
           <xsl:choose>
            <xsl:when test="$action='historypage'">
            <h1>History View</h1>
            <div class="ipaddress">IP: <xsl:value-of select="/xspwiki/processing-instruction('ip-address')"/></div>
            <div class="date">Date: <xsl:value-of select="/xspwiki/processing-instruction('modified')"/></div>
-           <div class="line">&#160;</div>
+           <hr/>
            </xsl:when>
           </xsl:choose>
        
@@ -50,15 +49,15 @@
         
 	<xsl:choose>
 	  <xsl:when test="$action='view'">
-	    <div class="line">&#160;</div>
-	    <a href="../../../edit/{/xspwiki/db}/{/xspwiki/page}?action=edit">Edit This Page</a> / <a href="./{/xspwiki/page}?action=history">Show Page History</a>
+              <hr/>
+	    <a href="./{/xspwiki/page}?action=edit">Edit This Page</a> / <a href="./{/xspwiki/page}?action=history">Show Page History</a>
 	  </xsl:when>
 	  <xsl:when test="$action='edit'">
-	    <div class="line">&#160;</div>
+              <hr/>
   	    <p><a href="EditTips">EditTips</a></p>
 	  </xsl:when>
           <xsl:when test="$action='historypage'">
-	    <div class="line">&#160;</div>
+              <hr/>
           <form action="./{/xspwiki/page}" method="POST">
            <input type="hidden" name="action" value="restore"/>
            <input type="hidden" name="id" value="{$id}"/>
@@ -66,7 +65,7 @@
           </form>
           </xsl:when>
           <xsl:when test="$action='history'">
-	    <div class="line">&#160;</div>
+              <hr/>
           </xsl:when>
 	  <xsl:otherwise>
 	  Other Mode?
@@ -84,6 +83,7 @@
 
 <xsl:template match="/xspwiki/title"/>
 <xsl:template match="/xspwiki/page"/>
+<xsl:template match="/xspwiki/db"/>
 
 <xsl:template match="xspwiki">
   <xsl:apply-templates/>
@@ -93,7 +93,8 @@
 <form action="./{/xspwiki/page}" method="POST" enctype="application/x-www-form-urlencoded">
   <input type="hidden" name="action" value="save"/>
   <h1><xsl:value-of select="/xspwiki/page"/> : 
-  <input type="submit" value=" Save "/></h1>
+      <input type="submit" value=" Save "/>
+      <input type="submit" name="preview" value=" Preview "/></h1>
   <textarea name="text" style="width:100%" rows="18" cols="80" wrap="virtual">
     <xsl:value-of select="string(./text)"/>
   </textarea>

@@ -5,7 +5,7 @@ use strict;
 use Apache::AxKit::Language::XSP::TaglibHelper;
 use vars qw($VERSION $NS @ISA @EXPORT_TAGLIB);
 
-$VERSION = '0.05';
+$VERSION = '0.06';
 
 # The namespace associated with this taglib.
 $NS = 'http://axkit.org/NS/xsp/wiki/1';
@@ -25,10 +25,19 @@ use Text::WikiFormat::SAX;
 
 sub _mkdb {
     my ($dbpath, $dbname) = @_;
-    return DBI->connect(
+    my $db = DBI->connect(
         'DBI:SQLite:dbname='. $dbpath . '/wiki-' . $dbname . '.db',
-        '', '', { AutoCommit => 0, RaiseError => 1 }
-        );
+        '', '', { AutoCommit => 1, RaiseError => 1 }
+    );
+    
+    eval {
+	$db->do('select * from Page, Formatter, History where 1 = 2');
+    };
+    if ($@) {
+	create_db($db);
+    }
+    
+    return $db;
 }
 
 sub display_page ($$$$$) {
@@ -36,17 +45,7 @@ sub display_page ($$$$$) {
     
     my $db = _mkdb($dbpath, $dbname);
     
-    eval {
-	$db->do('select * from Page, Formatter where 1 = 2');
-    };
-    if ($@) {
-	create_db($db);
-    }
-    
-    if ($action eq 'view') {
-	return view_page($db, $page);
-    }
-    elsif ($action eq 'edit') {
+    if ($action eq 'edit') {
 	return edit_page($db, $page);
     }
     elsif ($action eq 'history') {
@@ -55,11 +54,12 @@ sub display_page ($$$$$) {
     elsif ($action eq 'historypage') {
 	return show_history_page($db, $page, $id);
     }
-    # elsif ($action eq 'restore') {
-    #     return restore_page($db, $page, $id);
-    # }
+    if ($action eq 'view') {
+	return view_page($db, $page);
+    }
     else {
-	die "Unknown action: $action";
+        warn("Unrecognised action. Falling back to 'view'");
+        return view_page($db, $page);
     }
 }
 
@@ -219,6 +219,7 @@ sub _save_page {
     my ($db, $page, $contents, $texttype, $ip, $rss) = @_;
     # NB fix hard coded formatterid
     my $last_modified = time;
+    local $db->{AutoCommit} = 0;
     my (@row) = $db->selectrow_array("SELECT * FROM Page WHERE name = ?", {}, $page);
     if (@row) {
         # store history

@@ -10,5 +10,8 @@ webstuff/docbook.xsl
 webstuff/pod.xsl
 webstuff/view
 webstuff/wiki.xsl
+webstuff/wiki.css
 webstuff/wikitext.xsl
 webstuff/sidemenu.xsl
+webstuff/sidemenu.xml
+
