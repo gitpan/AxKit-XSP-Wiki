@@ -1,0 +1,11 @@
+Changes
+MANIFEST
+MANIFEST.SKIP
+Makefile.PL
+README
+lib/AxKit/XSP/Wiki.pm
+t/00basic.t
+webstuff/.htaccess
+webstuff/pod.xsl
+webstuff/view
+webstuff/wiki.xsl

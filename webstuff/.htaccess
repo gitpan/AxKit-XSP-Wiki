@@ -1,0 +1,19 @@
+
+DirectoryIndex view
+
+SetHandler axkit
+
+# AxDebugLevel 10
+
+<Perl>
+use lib '.';
+</Perl>
+
+AxAddXSPTaglib AxKit::XSP::Session
+AxAddXSPTaglib AxKit::XSP::PerForm
+AxAddXSPTaglib AxKit::XSP::Util
+AxAddXSPTaglib AxKit::XSP::Wiki
+
+AxAddRootProcessor application/x-xsp NULL wiki
+AxAddRootProcessor text/xsl wiki.xsl wiki
+

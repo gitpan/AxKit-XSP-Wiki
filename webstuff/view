@@ -1,0 +1,59 @@
+<wiki xmlns:wiki="http://axkit.org/NS/xsp/wiki/1"
+      xmlns:xsp="http://apache.org/xsp/core/v1"
+>
+    <!-- This file contains information about where to find the
+         wiki DB's, and also anything web specific, before
+         passing it all to the Wiki function (which returns XML) -->
+    <xsp:logic>
+      my $path_info = $r->path_info;
+      
+      my $dbroot = '/tmp';
+      
+      my ($db, $page) = ('AxKit', 'DefaultPage');
+      
+      if ($path_info) {
+        ($db, $page) = ($path_info =~ m|^/([A-Z]+)/([A-Z]+)|gi);
+	if (!$db) {
+          die "Invalid path_info: $path_info";
+	}
+	
+	if (!$page) {
+	  die "Invalid path_info: $path_info";
+	}
+	
+	if ($page !~ /^[A-Z]+$/i) {
+	  die "Invalid page name: $page";
+	}
+      }
+      else {
+        $r->header_out(Location => "view/$db/$page");
+	return 302;
+      }
+      
+      my $action = $cgi->param('action');
+      $action ||= 'view';
+      
+      if ($action eq 'save') {
+        AxKit::XSP::Wiki::save_page(
+				    $dbroot, $db, $page,
+				    $cgi->param('text'),
+				    );
+        $r->header_out(Location => "$page");
+	return 302;
+      }
+      
+      my $title = join(' ', split(/(?=[A-Z])/, $page));
+      
+      <xsp:content>
+        <title><xsp:expr>$title</xsp:expr></title>
+	<page><xsp:expr>$page</xsp:expr></page>
+        <wiki:display-page>
+          <wiki:dbpath><xsp:expr>$dbroot</xsp:expr></wiki:dbpath>
+          <wiki:db><xsp:expr>$db</xsp:expr></wiki:db>
+	  <wiki:page><xsp:expr>$page</xsp:expr></wiki:page>
+          <wiki:action><xsp:expr>$action</xsp:expr></wiki:action>
+        </wiki:display-page>
+      </xsp:content>
+      
+    </xsp:logic>
+</wiki>
