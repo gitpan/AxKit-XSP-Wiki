@@ -1,4 +1,5 @@
-<wiki xmlns:wiki="http://axkit.org/NS/xsp/wiki/1"
+<?xml version="1.0"?>
+<xspwiki xmlns:wiki="http://axkit.org/NS/xsp/wiki/1"
       xmlns:xsp="http://apache.org/xsp/core/v1"
 >
     <!-- This file contains information about where to find the
@@ -12,7 +13,8 @@
       my ($db, $page) = ('AxKit', 'DefaultPage');
       
       if ($path_info) {
-        ($db, $page) = ($path_info =~ m|^/([A-Z]+)/([A-Z:_]+)|gi);
+        ($db, $page) = ($path_info =~
+            m|^/([A-Z][A-Za-z0-9]+)/([A-Z][A-Za-z0-9:_]+)$|g);
 	if (!$db) {
           die "Invalid path_info: $path_info";
 	}
@@ -21,7 +23,7 @@
 	  die "Invalid path_info: $path_info";
 	}
 	
-	if ($page !~ /^[A-Z:_]+$/i) {
+	if ($page !~ /^[A-Z][A-Za-z0-9:_]+$/) {
 	  die "Invalid page name: $page";
 	}
       }
@@ -37,6 +39,7 @@
         AxKit::XSP::Wiki::save_page(
 				    $dbroot, $db, $page,
 				    $cgi->param('text'),
+				    $cgi->param('texttype'),
 				    );
         $r->header_out(Location => "./$page");
 	return 302;
@@ -56,4 +59,4 @@
       </xsp:content>
       
     </xsp:logic>
-</wiki>
+</xspwiki>

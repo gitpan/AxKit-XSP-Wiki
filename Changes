@@ -1,5 +1,10 @@
 AxKit::XSP::Wiki Changes
 
+0.03
+    - Use Text::WikiFormat::SAX for WikiText formatting
+    - A number of stylesheet cleanups
+    - A few minor bug fixes
+
 0.02
     - Allow Perl module names and a few other characters as links
     - Fixed some relative URI "bugs"

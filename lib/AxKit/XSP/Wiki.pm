@@ -5,7 +5,7 @@ use strict;
 use Apache::AxKit::Language::XSP::TaglibHelper;
 use vars qw($VERSION $NS @ISA @EXPORT_TAGLIB);
 
-$VERSION = '0.02';
+$VERSION = '0.03';
 
 # The namespace associated with this taglib.
 $NS = 'http://axkit.org/NS/xsp/wiki/1';
@@ -19,6 +19,8 @@ $NS = 'http://axkit.org/NS/xsp/wiki/1';
 use DBI;
 use XML::SAX::Writer;
 use Pod::SAX;
+use XML::LibXML::SAX::Parser;
+use Text::WikiFormat::SAX;
 
 sub display_page ($$$$) {
     my ($dbpath, $dbname, $page, $action) = @_;
@@ -68,7 +70,7 @@ EOT
 	    $output = <<EOT;
 <pod>
   <para>
-    Error parsing the pod: $@
+    Error parsing the page: $@
   </para>
 </pod>
 EOT
@@ -84,6 +86,7 @@ New page
 </pod>
 EOT
     }
+    $output =~ s/^<\?xml\s.*?\?>//s;
     return $output;
 }
 
@@ -97,36 +100,54 @@ sub xml_escape {
 sub edit_page {
     my ($db, $page) = @_;
     my $sth = $db->prepare(<<'EOT');
-  SELECT Page.content, Formatter.module
-  FROM Page, Formatter
-  WHERE Page.formatterid = Formatter.id
-  AND   Page.name = ?
+  SELECT Page.content, Page.formatterid
+  FROM Page
+  WHERE Page.name = ?
 EOT
     $sth->execute($page);
     
-    my $output = '<edit>';
+    my $output = '<edit><text>';
+    my $formatter = 1;
     while ( my $row = $sth->fetch ) {
 	# create the parser
 	$output .= xml_escape($row->[0]);
+	$formatter = $row->[1];
 	last;
     }
-    $output .= '</edit>';
+    $sth->finish;
+    
+    $output .= '</text><texttypes>';
+    
+    $sth = $db->prepare(<<'EOT');
+  SELECT Formatter.id, Formatter.name
+  FROM Formatter
+EOT
+    $sth->execute();
+    while (my $row = $sth->fetch) {
+	$output .= '<texttype id="'. xml_escape($row->[0]) . 
+	  ($formatter == $row->[0] ? '" selected="selected">' : '">') . 
+	  xml_escape($row->[1]) . '</texttype>';
+    }
+    $sth->finish;
+    
+    $output .= '</texttypes></edit>';
     return $output;
 }
 
 sub save_page {
-    my ($dbpath, $dbname, $page, $contents) = @_;
+    my ($dbpath, $dbname, $page, $contents, $texttype) = @_;
     
     my $db = DBI->connect('DBI:SQLite:dbname='. $dbpath . '/wiki-' . $dbname . '.db',
 		       '', '', { AutoCommit => 0, RaiseError => 1 }
 		       );
 
     # NB fix hard coded formatterid
+    my $last_modified = time;
     my $sth = $db->prepare(<<'EOT');
-  INSERT OR REPLACE INTO Page ( name, formatterid, content )
-  VALUES ( ?, ?, ? )
+  INSERT OR REPLACE INTO Page ( name, formatterid, content, last_modified )
+  VALUES ( ?, ?, ?, ? )
 EOT
-    $sth->execute($page, 1, $contents);
+    $sth->execute($page, $texttype, $contents, $last_modified);
     $db->commit;
 }
 
@@ -134,16 +155,24 @@ sub create_db {
     my ($db) = @_;
     
     $db->do(q{
-	create table Page ( id INTEGER PRIMARY KEY, name, formatterid, content )
+	create table Page ( 
+			   id INTEGER PRIMARY KEY,
+			   name NOT NULL,
+			   formatterid NOT NULL,
+			   content,
+			   last_modified
+			   )
     });
     $db->do(q{
 	create unique index Page_name on Page ( name )
     });
     $db->do(q{
-	create table Formatter ( id INTEGER PRIMARY KEY, module)
+	create table Formatter ( id INTEGER PRIMARY KEY, module NOT NULL, name NOT NULL)
     });
     $db->do(q{
-	insert into Formatter (module) values ('Pod::SAX')
+	insert into Formatter (module, name) values ('Pod::SAX', 'pod - plain old documentation')
+	insert into Formatter (module, name) values ('Text::WikiFormat::SAX', 'wiki text')
+	insert into Formatter (module, name) values ('XML::LibXML::SAX::Parser', 'xml (freeform)')
     });
     $db->commit;
 }
