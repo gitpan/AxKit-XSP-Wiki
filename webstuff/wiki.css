@@ -11,6 +11,12 @@ DIV.topbanner {
   font-size: 20pt;
 }
 
+DIV.searchbanner {
+  position: absolute;
+  top: 0%;
+  right: 5;
+}
+
 DIV.topbanner img {
   vertical-align: middle;
 }

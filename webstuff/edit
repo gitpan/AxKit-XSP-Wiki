@@ -12,6 +12,7 @@
       my $default_page = $r->dir_config( 'DefaultPage' ) || 'DefaultPage';
       $AxKit::XSP::Wiki::EmailAlerts = $r->dir_config('WikiEmailTo');
       my $uri = $r->uri;
+      $uri =~ s/\/edit/\/view/;
       
       my ($db, $page) = AxKit::XSP::Wiki::extract_page_info($path_info);
 
@@ -30,34 +31,42 @@
       if ($id !~ /^\d*$/) {
         die "Invalid id format";
       }
+
+      my $ip = $r->get_remote_host();
+      my $user = $r->connection->user();
       
-      if ($action eq 'search') {
+      if ($action eq 'save') {
+        AxKit::XSP::Wiki::save_page(
+          $dbroot, $db, $page, $cgi->param('text'), $cgi->param('texttype'), $ip, $user, 
+        );
+        $r->header_out(Location => "$uri/$db/$page");
+        return 302;
+      }
+      elsif ($action eq 'restore') {
+        AxKit::XSP::Wiki::restore_page(
+          $dbroot, $db, $page, $ip, $id, $user, 
+        );
+        $r->header_out(Location => "$uri/$db/$page");
+        return 302;
+      }
+      elsif ($action eq 'preview') {
        <xsp:content>
         <page><xsp:expr>$page</xsp:expr></page>
         <db><xsp:expr>$db</xsp:expr></db>
         <main-content>
-        <wiki:search>
+        <wiki:preview-page>
           <wiki:dbpath><xsp:expr>$dbroot</xsp:expr></wiki:dbpath>
           <wiki:db><xsp:expr>$db</xsp:expr></wiki:db>
-          <wiki:query><xsp:expr>$cgi->param('q')</xsp:expr></wiki:query>
-        </wiki:search>
+          <wiki:page><xsp:expr>$page</xsp:expr></wiki:page>
+          <wiki:text><xsp:expr>$cgi->param('text')</xsp:expr></wiki:text>
+          <wiki:texttype><xsp:expr>$cgi->param('texttype')</xsp:expr></wiki:texttype>
+        </wiki:preview-page>
         </main-content>
        </xsp:content>
       }
       else {
-      <xsp:content>
-	<page><xsp:expr>$page</xsp:expr></page>
-        <db><xsp:expr>$db</xsp:expr></db>
-        <main-content>
-        <wiki:display-page>
-          <wiki:dbpath><xsp:expr>$dbroot</xsp:expr></wiki:dbpath>
-          <wiki:db><xsp:expr>$db</xsp:expr></wiki:db>
-	  <wiki:page><xsp:expr>$page</xsp:expr></wiki:page>
-          <wiki:action><xsp:expr>$action</xsp:expr></wiki:action>
-          <wiki:id><xsp:expr>$id</xsp:expr></wiki:id>
-        </wiki:display-page>
-        </main-content>
-      </xsp:content>
+        $r->header_out(Location => "$uri/$db/$page");
+	return 302;
       }
       
     </xsp:logic>

@@ -10,19 +10,29 @@ AxGzipOutput On
 
 AxAddStyleMap text/xsl Apache::AxKit::Language::LibXSLT
 
-AxDebugLevel 7
-AxLogDeclines On
+AxDebugLevel 0
+AxLogDeclines Off
 
 AxAddXSPTaglib AxKit::XSP::Wiki
 
 AxAddRootProcessor application/x-xsp NULL xspwiki
 AxAddRootProcessor text/xsl wiki.xsl xspwiki
 
-AxTraceIntermediate /tmp/axkit-trace
+# Use this option for heavy debugging
+#AxTraceIntermediate /tmp/axkit-trace
 
 # you must create this directory, and it must be
 # writable by the apache user
 PerlSetVar WikiDBRoot /tmp/wikidbs
+
+# The default "Wiki" to use if none is specified in the URL
+#PerlSetVar WikiDB     AxKit
+
+# The default root page of the wiki
+#PerlSetVar DefaultPage  DefaultPage
+
+# Who to send email diffs to
+#PerlSetVar WikiEmailTo  root@localhost
 
 <Files *.css>
 SetHandler default-handler

@@ -1,5 +1,11 @@
 AxKit::XSP::Wiki Changes
 
+0.07
+    - Added search
+    - Added email diffs
+    - Split view file into view and edit, so you can apply
+      security to the edit XSP page
+
 0.06
     - Code cleanups
     - Many XSLT fixes - should mostly work out of the box
