@@ -24,7 +24,7 @@
 </xsl:template>
 
 <xsl:template match="head1">
-  <h1><xsl:apply-templates/></h1>
+  <h1><a name="{.}"><xsl:apply-templates/></a></h1>
 </xsl:template>
 
 <xsl:template match="head2">

@@ -22,7 +22,7 @@
 	<xsl:choose>
 	  <xsl:when test="$action='view'">
 	    <hr/>
-	    <a href="?action=edit">Edit This Page</a>
+	    <a href="./{/wiki/page}?action=edit">Edit This Page</a>
 	  </xsl:when>
 	  <xsl:when test="$action='edit'">
 	  <p><a href="EditTips">EditTips</a></p>
@@ -31,7 +31,6 @@
 	  Other Mode?
 	  </xsl:otherwise>
 	</xsl:choose>
-	
       </body>
 	
     </html>
@@ -45,7 +44,7 @@
 </xsl:template>
 
 <xsl:template match="edit">
-<form action="{/wiki/page}" method="POST">
+<form action="./{/wiki/page}" method="POST">
   <input type="hidden" name="action" value="save"/>
   <h1><xsl:value-of select="/wiki/page"/> : 
   <input type="submit" value=" Save "/></h1>

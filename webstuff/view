@@ -12,7 +12,7 @@
       my ($db, $page) = ('AxKit', 'DefaultPage');
       
       if ($path_info) {
-        ($db, $page) = ($path_info =~ m|^/([A-Z]+)/([A-Z]+)|gi);
+        ($db, $page) = ($path_info =~ m|^/([A-Z]+)/([A-Z:_]+)|gi);
 	if (!$db) {
           die "Invalid path_info: $path_info";
 	}
@@ -21,7 +21,7 @@
 	  die "Invalid path_info: $path_info";
 	}
 	
-	if ($page !~ /^[A-Z]+$/i) {
+	if ($page !~ /^[A-Z:_]+$/i) {
 	  die "Invalid page name: $page";
 	}
       }
@@ -38,7 +38,7 @@
 				    $dbroot, $db, $page,
 				    $cgi->param('text'),
 				    );
-        $r->header_out(Location => "$page");
+        $r->header_out(Location => "./$page");
 	return 302;
       }
       

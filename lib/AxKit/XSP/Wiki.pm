@@ -2,10 +2,10 @@ package AxKit::XSP::Wiki;
 
 use strict;
 
-
 use Apache::AxKit::Language::XSP::TaglibHelper;
 use vars qw($VERSION $NS @ISA @EXPORT_TAGLIB);
-$VERSION = 0.01;
+
+$VERSION = '0.02';
 
 # The namespace associated with this taglib.
 $NS = 'http://axkit.org/NS/xsp/wiki/1';
@@ -61,7 +61,18 @@ EOT
     while ( my $row = $sth->fetch ) {
 	# create the parser
 	my $parser = $row->[1]->new(Handler => $handler);
-	$parser->parse_string($row->[0]);
+	eval {
+	    $parser->parse_string($row->[0]);
+	};
+	if ($@) {
+	    $output = <<EOT;
+<pod>
+  <para>
+    Error parsing the pod: $@
+  </para>
+</pod>
+EOT
+	}
 	last;
     }
     if (!$output) {
