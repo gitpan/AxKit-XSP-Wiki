@@ -1,5 +1,11 @@
 AxKit::XSP::Wiki Changes
 
+0.05
+    - Added history (including restore)
+    - Added preview
+    - Fixed a few issues in how redirecting worked
+    - Cleaned up some of the code in the XSP page
+
 0.04
     - 0.03 went out with quite a few bugs. Fixed them.
     

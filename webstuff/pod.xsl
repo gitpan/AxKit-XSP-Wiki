@@ -17,11 +17,18 @@
 </xsl:template>
 
 <xsl:template match="link" mode="pod">
-  <a href="./{@page}#{@section}"><xsl:apply-templates mode="pod"/></a>
+  <xsl:choose>
+    <xsl:when test='string-length(@section) and not( string-length(@page) )'>
+      <a href="#{@section}"><xsl:apply-templates mode="pod"/></a>
+    </xsl:when>
+    <xsl:otherwise>
+      <a href="./{@page}#{@section}"><xsl:apply-templates mode="pod"/></a>
+    </xsl:otherwise>
+  </xsl:choose>
 </xsl:template>
 
 <xsl:template match="xlink" mode="pod">
-  <a href="{@href}"><xsl:apply-templates mode="pod"/></a>
+  <a href="{@href}"><xsl:apply-templates mode="pod"/></a><img src="/img/out.png"/>
 </xsl:template>
 
 <xsl:template match="head1" mode="pod">
@@ -70,6 +77,10 @@
 
 <xsl:template match="I" mode="pod">
   <i><xsl:apply-templates mode="pod"/></i>
+</xsl:template>
+
+<xsl:template match="F" mode="pod">
+  <literal><xsl:apply-templates mode="pod"/></literal>
 </xsl:template>
 
 </xsl:stylesheet>

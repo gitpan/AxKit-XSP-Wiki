@@ -7,6 +7,7 @@
 <xsl:include href="pod.xsl"/>
 <xsl:include href="wikitext.xsl"/>
 <xsl:include href="docbook.xsl"/>
+<xsl:include href="sidemenu.xsl"/>
 
 <xsl:output method="html"/>
 
@@ -15,35 +16,67 @@
 <xsl:template match="/">
     <html>
       <head>
-        <title><xsl:value-of select="/xspwiki/title"/></title>
+        <title><xsl:value-of select="/xspwiki/page"/></title>
+	<link rel="Stylesheet" href="/wiki/wiki.css"
+              type="text/css" media="screen" />
       </head>
 	
       <body>
-        <table width="100%">
-	 <tr>
-	 <td width="5">&#160;</td>
-	 <td align="center"><h3><a href="/">~ My Wiki ~</a></h3></td>
-	 </tr>
-	 <tr>
-	 <td width="5">&#160;</td><td>
-      
-        <xsl:apply-templates/>
-	
+       <div class="topbanner">
+         <a href="http://xml.apache.org/"><img src="/img/xmlapache.gif" border="0"/></a>
+         AxKit Wiki
+       </div>
+       <div class="base">
+        <table><tr><td valign="top" width="160">
+        <div class="sidemenu">
+         <xsl:apply-templates select="document('/wiki/sidemenu.xml')" mode="sidemenu"/>
+        </div></td><td valign="top" width="80%">
+        <div class="maincontent">
+         <div class="breadcrumbs">
+          <a href="/">AxKit</a> :: <a href="DefaultPage">Wiki</a> :: <xsl:value-of select="/xspwiki/page"/>
+         </div>
+         <div class="line"/>
+         <div class="content">
+          <xsl:choose>
+           <xsl:when test="$action='historypage'">
+           <h1>History View</h1>
+           <div class="ipaddress">IP: <xsl:value-of select="/xspwiki/processing-instruction('ip-address')"/></div>
+           <div class="date">Date: <xsl:value-of select="/xspwiki/processing-instruction('modified')"/></div>
+           <div class="line">&#160;</div>
+           </xsl:when>
+          </xsl:choose>
+       
+         <xsl:apply-templates/>
+        
 	<xsl:choose>
 	  <xsl:when test="$action='view'">
-	    <hr/>
-	    <a href="./{/xspwiki/page}?action=edit">Edit This Page</a>
+	    <div class="line">&#160;</div>
+	    <a href="../../../edit/{/xspwiki/db}/{/xspwiki/page}?action=edit">Edit This Page</a> / <a href="./{/xspwiki/page}?action=history">Show Page History</a>
 	  </xsl:when>
 	  <xsl:when test="$action='edit'">
-	  <p><a href="EditTips">EditTips</a></p>
+	    <div class="line">&#160;</div>
+  	    <p><a href="EditTips">EditTips</a></p>
 	  </xsl:when>
+          <xsl:when test="$action='historypage'">
+	    <div class="line">&#160;</div>
+          <form action="./{/xspwiki/page}" method="POST">
+           <input type="hidden" name="action" value="restore"/>
+           <input type="hidden" name="id" value="{$id}"/>
+           <input type="submit" name="Submit" value="Restore This Version"/>
+          </form>
+          </xsl:when>
+          <xsl:when test="$action='history'">
+	    <div class="line">&#160;</div>
+          </xsl:when>
 	  <xsl:otherwise>
 	  Other Mode?
 	  </xsl:otherwise>
 	</xsl:choose>
-	 </td>
-	 </tr>
-	</table>
+
+         </div> <!-- content -->	
+        </div> <!-- maincontent -->
+        </td></tr></table>
+       </div> <!-- base -->
       </body>
 	
     </html>
@@ -84,13 +117,46 @@
   </option>
 </xsl:template>
 
-<xsl:template match="node()|@*">
+<xsl:template match="history">
+  <h1>History for <xsl:value-of select="/xspwiki/page"/></h1>
+  <table>
+  <tr><th>Date</th><th>IP Address</th><th>Bytes</th></tr>
+  <xsl:apply-templates select="./entry"/>
+  </table>
+</xsl:template>
+
+<xsl:template match="history/entry">
+  <tr>
+    <xsl:apply-templates/>
+  </tr>
+</xsl:template>
+
+<xsl:template match="history/entry/id">
+</xsl:template>
+
+<xsl:template match="history/entry/modified">
+  <td><a href="./{/xspwiki/page}?action=historypage;id={../id}"><xsl:apply-templates/></a></td>
+</xsl:template>
+
+<xsl:template match="history/entry/ip-address">
+  <td><xsl:apply-templates/></td>
+</xsl:template>
+
+<xsl:template match="history/entry/bytes">
+  <td><xsl:apply-templates/></td>
+</xsl:template>
+
+<xsl:template match="newpage">
+  <i>This page has not yet been created</i>
+</xsl:template>
+
 <!-- useful for testing - commented out for live
+<xsl:template match="node()|@*">
   <xsl:copy>
    <xsl:apply-templates select="@*"/>
    <xsl:apply-templates/>
   </xsl:copy>
--->
 </xsl:template>
+-->
 
 </xsl:stylesheet>

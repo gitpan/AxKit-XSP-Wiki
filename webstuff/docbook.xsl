@@ -2,13 +2,13 @@
 <xsl:stylesheet xmlns:xsl="http://www.w3.org/1999/XSL/Transform"
 	version="1.0">
 
-  <xsl:template match="article">
-    <xsl:apply-templates mode="docbook"/>
-  </xsl:template>
+<xsl:template match="article">
+  <xsl:apply-templates mode="docbook"/>
+</xsl:template>
   
-  <xsl:template match="abstract" mode="docbook">
+<xsl:template match="abstract" mode="docbook">
     
-  </xsl:template>
+</xsl:template>
 
 <xsl:template match="section" mode="docbook">
   <div class="section">
@@ -25,13 +25,14 @@
 
     <xsl:element name="h{number( count(ancestor-or-self::section) + 1)}">
       <a name="{translate(title, ' -)(?:&#xA;', '')}">
-      <xsl:value-of select="title"/>
+        <xsl:apply-templates mode="docbook" select="title"/>
       </a>
     </xsl:element>
 
-  <xsl:apply-templates mode="docbook"/>
+  <xsl:apply-templates mode="docbook" select="*[local-name() != 'title']"/>
   
  </div>
+ <hr/> 
 </xsl:template>
 
 <xsl:template match="para" mode="docbook">
@@ -61,7 +62,7 @@
 <xsl:template match="ulink" mode="docbook">
   <a href="{@url}">
     <xsl:apply-templates mode="docbook"/>
-  </a>
+  </a><img src="/img/out.png"/>
 </xsl:template>
 
 <xsl:template match="xref" mode="docbook">
@@ -142,7 +143,20 @@
     <xsl:apply-templates mode="docbook"/>
 </xsl:template>
 
-<xsl:template match="title|/article/articleinfo/*" mode="docbook"></xsl:template>
+<xsl:template match="section/title" mode="docbook">
+  <xsl:apply-templates mode="docbook"/>
+</xsl:template>
+
+<xsl:template match="article/title" mode="docbook">
+  <h1>
+    <xsl:apply-templates mode="docbook"/>
+  </h1>
+  <hr/>
+</xsl:template>
+
+<xsl:template match="title" mode="docbook"></xsl:template>
+
+<xsl:template match="/article/articleinfo/*" mode="docbook"></xsl:template>
 <!-- end core sdocbook elements -->
 
 </xsl:stylesheet>

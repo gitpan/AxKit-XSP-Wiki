@@ -14,6 +14,9 @@
   
   <xsl:template match="link" mode="wiki">
     <a href="{@href}"><xsl:apply-templates mode="wiki"/></a>
+    <xsl:if test="contains(@href, 'http:')">
+      <img src="/img/out.png"/>
+    </xsl:if>
   </xsl:template>
   
   <xsl:template match="strong" mode="wiki">

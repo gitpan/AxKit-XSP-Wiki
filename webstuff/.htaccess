@@ -5,10 +5,22 @@ SetHandler axkit
 
 AxGzipOutput Off
 
-AxDebugLevel 0
+AxDebugLevel 7
 
+<Perl>
+use lib '.';
+</Perl>
+
+AxAddXSPTaglib AxKit::XSP::Session
+AxAddXSPTaglib AxKit::XSP::PerForm
+AxAddXSPTaglib AxKit::XSP::Util
 AxAddXSPTaglib AxKit::XSP::Wiki
 
 AxAddRootProcessor application/x-xsp NULL xspwiki
 AxAddRootProcessor text/xsl wiki.xsl xspwiki
 
+AxTraceIntermediate /tmp/axkit-trace
+
+<Files *.css>
+SetHandler default-handler
+</Files>
