@@ -1,5 +1,8 @@
 AxKit::XSP::Wiki Changes
 
+0.04
+    - 0.03 went out with quite a few bugs. Fixed them.
+    
 0.03
     - Use Text::WikiFormat::SAX for WikiText formatting
     - A number of stylesheet cleanups

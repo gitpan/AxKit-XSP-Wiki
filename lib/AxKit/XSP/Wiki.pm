@@ -5,7 +5,7 @@ use strict;
 use Apache::AxKit::Language::XSP::TaglibHelper;
 use vars qw($VERSION $NS @ISA @EXPORT_TAGLIB);
 
-$VERSION = '0.03';
+$VERSION = '0.04';
 
 # The namespace associated with this taglib.
 $NS = 'http://axkit.org/NS/xsp/wiki/1';
@@ -165,15 +165,19 @@ sub create_db {
     });
     $db->do(q{
 	create unique index Page_name on Page ( name )
-    });
+	     });
     $db->do(q{
 	create table Formatter ( id INTEGER PRIMARY KEY, module NOT NULL, name NOT NULL)
-    });
+	     });
     $db->do(q{
 	insert into Formatter (module, name) values ('Pod::SAX', 'pod - plain old documentation')
+	     });
+    $db->do(q{
 	insert into Formatter (module, name) values ('Text::WikiFormat::SAX', 'wiki text')
+	     });
+    $db->do(q{
 	insert into Formatter (module, name) values ('XML::LibXML::SAX::Parser', 'xml (freeform)')
-    });
+	     });
     $db->commit;
 }
 

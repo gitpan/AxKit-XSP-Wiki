@@ -3,14 +3,12 @@ DirectoryIndex view
 
 SetHandler axkit
 
-# AxDebugLevel 10
+AxGzipOutput Off
 
-<Perl>
-use lib '.';
-</Perl>
+AxDebugLevel 0
 
 AxAddXSPTaglib AxKit::XSP::Wiki
 
-AxAddRootProcessor application/x-xsp NULL wiki
-AxAddRootProcessor text/xsl wiki.xsl wiki
+AxAddRootProcessor application/x-xsp NULL xspwiki
+AxAddRootProcessor text/xsl wiki.xsl xspwiki
 

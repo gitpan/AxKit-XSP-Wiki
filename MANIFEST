@@ -6,6 +6,8 @@ README
 lib/AxKit/XSP/Wiki.pm
 t/00basic.t
 webstuff/.htaccess
+webstuff/docbook.xsl
 webstuff/pod.xsl
 webstuff/view
 webstuff/wiki.xsl
+webstuff/wikitext.xsl
